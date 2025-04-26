@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode, useState, useEffect } from "react";
 import Iconos from "./components/Icons";
 import BancolombiaLogo from "../src/assets/bancolombia.jpeg";
 import DaviviendaLogo from "../src/assets/davivienda.jpeg";
@@ -33,9 +33,22 @@ export const ModalPasarelaDePago: React.FC<ModalPasarelaDePagoProps> = ({
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const [payments, setPayments] = useState<PaymentMethod[]>([]);
-  const [customAmounts, setCustomAmounts] = useState<Record<number, number>>(
-    {}
-  );
+  const [customAmounts, setCustomAmounts] = useState<Record<number, number>>({});
+
+  // Cerrar dropdown al hacer clic fuera
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const dropdown = document.querySelector('.dropdown-container');
+      
+      if (isDropdownOpen && dropdown && !dropdown.contains(target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isDropdownOpen]);
 
   const paymentMethods: PaymentMethod[] = [
     { id: 1, name: "Efectivo", icon: <Iconos icono="billete" /> },
@@ -64,31 +77,37 @@ export const ModalPasarelaDePago: React.FC<ModalPasarelaDePagoProps> = ({
   };
 
   const handleAmountChange = (id: number, value: string): void => {
-    const numericValue = parseFloat(value) || 0;
+    const numericValue = Math.min(parseFloat(value) || 0, money);
     setCustomAmounts({
       ...customAmounts,
       [id]: numericValue,
     });
   };
 
+  const calculateTotalPaid = (): number => {
+    return Object.values(customAmounts).reduce(
+      (sum, amount) => sum + (amount || 0),
+      0
+    );
+  };
+
   const calculatePaymentAmount = (paymentId: number): number => {
     if (customAmounts[paymentId] !== undefined) {
       return customAmounts[paymentId];
     }
-
-    if (Object.keys(customAmounts).length === 0) {
-      return money / payments.length;
+    
+    if (payments.length === 0) return 0;
+    
+    const remaining = money - calculateTotalPaid();
+    const paymentsWithoutCustomAmount = payments.filter(p => customAmounts[p.id] === undefined);
+    
+    if (paymentsWithoutCustomAmount.some(p => p.id === paymentId)) {
+      return remaining > 0 && paymentsWithoutCustomAmount.length > 0 
+        ? remaining / paymentsWithoutCustomAmount.length 
+        : 0;
     }
 
     return 0;
-  };
-
-  const calculateRemainingAmount = (): number => {
-    const customAmountsSum = Object.values(customAmounts).reduce(
-      (sum, amount) => sum + (amount || 0),
-      0
-    );
-    return money - customAmountsSum;
   };
 
   const formatMoney = (value: number): string => {
@@ -100,6 +119,15 @@ export const ModalPasarelaDePago: React.FC<ModalPasarelaDePagoProps> = ({
     }).format(value);
   };
 
+  // Preparar pagos visibles con montos calculados
+  const visiblePayments = payments.map(payment => ({
+    ...payment,
+    calculatedAmount: calculatePaymentAmount(payment.id)
+  }));
+
+  // Calcular saldo actual
+  const currentBalance = money - calculateTotalPaid();
+
   return (
     <div className="w-[430px] h-screen max-w-md mx-auto bg-gray-100 shadow-md overflow-hidden">
       {/* Header */}
@@ -107,7 +135,7 @@ export const ModalPasarelaDePago: React.FC<ModalPasarelaDePagoProps> = ({
         <button
           onClick={onBack}
           className="bg-gray-400 hover:bg-red-200 p-1 rounded-sm w-8 h-8
-               flex items-center justify-center mr-4"
+              flex items-center justify-center mr-4"
           aria-label="Volver atrás"
         >
           <Iconos icono={"flechaIzq"} />
@@ -124,9 +152,9 @@ export const ModalPasarelaDePago: React.FC<ModalPasarelaDePagoProps> = ({
           )}
         </div>
 
-        <div className="px-3 py-1 rounded-full">
-          <span className="text-red-600 font-roboto text-sm font-medium">
-            {formatMoney(money)}
+        <div className="px-3 py-1">
+        <span className={`${currentBalance > 0 ? "text-red-600" : "text-green-600"} font-roboto text-sm font-medium`}>
+            {formatMoney(currentBalance)}
           </span>
         </div>
       </div>
@@ -134,11 +162,11 @@ export const ModalPasarelaDePago: React.FC<ModalPasarelaDePagoProps> = ({
       {/* Contenido principal */}
       <div className="p-6 flex flex-col items-center">
         {/* Dropdown */}
-        <div className="mb-4 relative w-[398px]">
+        <div className="relative w-[398px] dropdown-container">
           <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             className="w-full h-[60px] flex items-center justify-between bg-white
-                   text-black py-3 px-4 cursor-pointer"
+                  text-black py-3 px-4 cursor-pointer"
             aria-expanded={isDropdownOpen}
             aria-haspopup="listbox"
           >
@@ -154,14 +182,14 @@ export const ModalPasarelaDePago: React.FC<ModalPasarelaDePagoProps> = ({
           {isDropdownOpen && (
             <div
               className="absolute w-full bg-white border-gray-200 
-                         shadow-lg overflow-hidden z-10"
+                        shadow-lg overflow-hidden z-10"
               role="listbox"
             >
               {paymentMethods.map((method) => (
                 <div
                   key={method.id}
                   className="flex items-center px-4 py-3 hover:bg-indigo-50 
-                             cursor-pointer border-b border-gray-100 last:border-b-0"
+                            cursor-pointer border-b border-gray-100 last:border-b-0"
                   onClick={() => handleAddPayment(method)}
                   role="option"
                   aria-selected={payments.some((p) => p.id === method.id)}
@@ -176,19 +204,19 @@ export const ModalPasarelaDePago: React.FC<ModalPasarelaDePagoProps> = ({
                     <span className="mr-3 text-lg">{method.icon}</span>
                   )}
                   <span>{method.name}</span>
-                </div>
+                </div>  
               ))}
             </div>
           )}
         </div>
 
         {/* Lista de pagos */}
-        {payments.length > 0 && (
+        {visiblePayments.length > 0 && (
           <div className="w-[398px] space-y-2">
-            {payments.map((payment) => (
+            {visiblePayments.map((payment) => (
               <div
                 key={payment.id}
-                className="flex items-center justify-between bg-white p-3 rounded"
+                className="flex items-center justify-between bg-white p-3"
               >
                 <div className="flex items-center">
                   {payment.image ? (
@@ -210,11 +238,13 @@ export const ModalPasarelaDePago: React.FC<ModalPasarelaDePagoProps> = ({
                     onChange={(e) =>
                       handleAmountChange(payment.id, e.target.value)
                     }
-                    className="w-20 border rounded px-2 py-1 text-right appearance-none [-moz-appearance:textfield]"
+                    className="w-20 border px-2 py-1 text-right appearance-none [-moz-appearance:textfield]"
                     placeholder=""
+                    min="0"
+                    max={money}
                   />
                   <span className="text-gray-500 w-20 text-right">
-                    {formatMoney(calculatePaymentAmount(payment.id))}
+                    {formatMoney(payment.calculatedAmount)}
                   </span>
                   <button
                     onClick={() => handleRemovePayment(payment.id)}
@@ -226,33 +256,17 @@ export const ModalPasarelaDePago: React.FC<ModalPasarelaDePagoProps> = ({
                 </div>
               </div>
             ))}
-
-            {/* Mostrar saldo restante */}
-            <div className="bg-white p-3 rounded">
-              <div className="flex justify-between">
-                <span className="font-medium">Saldo restante:</span>
-                <span
-                  className={
-                    calculateRemainingAmount() > 0
-                      ? "text-red-500"
-                      : "text-green-500"
-                  }
-                >
-                  {formatMoney(calculateRemainingAmount())}
-                </span>
-              </div>
-            </div>
           </div>
         )}
 
         {/* Total de pagos */}
-        <div className="bg-white p-4 w-[398px] mt-4 rounded">
-          <div className="flex justify-between items-center">
-            <span className="text-gray-600 font-normal text-sm">
+        <div className="bg-white p-2 w-[398px] mt-3 h-[60px]">
+          <div className="flex flex-col justify-between">
+            <span className="text-gray-600 font-normal text-xs">
               Total pagos
             </span>
-            <span className="text-lg font-medium text-gray-800">
-              {formatMoney(money - calculateRemainingAmount())}
+            <span className="text-base font-medium text-gray-800">
+              {formatMoney(calculateTotalPaid())}
             </span>
           </div>
         </div>
