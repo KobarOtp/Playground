@@ -1,9 +1,9 @@
 import Header from "../../layout/header/Header";
 import { ModalPasarelaDePago } from "../../ModalPasarelaDePago";
-import PaymentScreen from "../../PaymentScreen";
+import PaymentScreen from "../../components/PasarelaPagos/PaymentScreen";
 
 const IpOnline = () => {
-  return <PaymentScreen />;
+  return <PaymentScreen/>;
 };
 
 export default IpOnline;
