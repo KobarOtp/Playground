@@ -33,21 +33,23 @@ export const ModalPasarelaDePago: React.FC<ModalPasarelaDePagoProps> = ({
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const [payments, setPayments] = useState<PaymentMethod[]>([]);
-  const [customAmounts, setCustomAmounts] = useState<Record<number, number>>({});
+  const [customAmounts, setCustomAmounts] = useState<Record<number, number>>(
+    {}
+  );
 
   // Cerrar dropdown al hacer clic fuera
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      const dropdown = document.querySelector('.dropdown-container');
-      
+      const dropdown = document.querySelector(".dropdown-container");
+
       if (isDropdownOpen && dropdown && !dropdown.contains(target)) {
         setIsDropdownOpen(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isDropdownOpen]);
 
   const paymentMethods: PaymentMethod[] = [
@@ -95,15 +97,17 @@ export const ModalPasarelaDePago: React.FC<ModalPasarelaDePagoProps> = ({
     if (customAmounts[paymentId] !== undefined) {
       return customAmounts[paymentId];
     }
-    
+
     if (payments.length === 0) return 0;
-    
+
     const remaining = money - calculateTotalPaid();
-    const paymentsWithoutCustomAmount = payments.filter(p => customAmounts[p.id] === undefined);
-    
-    if (paymentsWithoutCustomAmount.some(p => p.id === paymentId)) {
-      return remaining > 0 && paymentsWithoutCustomAmount.length > 0 
-        ? remaining / paymentsWithoutCustomAmount.length 
+    const paymentsWithoutCustomAmount = payments.filter(
+      (p) => customAmounts[p.id] === undefined
+    );
+
+    if (paymentsWithoutCustomAmount.some((p) => p.id === paymentId)) {
+      return remaining > 0 && paymentsWithoutCustomAmount.length > 0
+        ? remaining / paymentsWithoutCustomAmount.length
         : 0;
     }
 
@@ -120,9 +124,9 @@ export const ModalPasarelaDePago: React.FC<ModalPasarelaDePagoProps> = ({
   };
 
   // Preparar pagos visibles con montos calculados
-  const visiblePayments = payments.map(payment => ({
+  const visiblePayments = payments.map((payment) => ({
     ...payment,
-    calculatedAmount: calculatePaymentAmount(payment.id)
+    calculatedAmount: calculatePaymentAmount(payment.id),
   }));
 
   // Calcular saldo actual
@@ -153,7 +157,11 @@ export const ModalPasarelaDePago: React.FC<ModalPasarelaDePagoProps> = ({
         </div>
 
         <div className="px-3 py-1">
-        <span className={`${currentBalance > 0 ? "text-red-600" : "text-green-600"} font-roboto text-sm font-medium`}>
+          <span
+            className={`${
+              currentBalance > 0 ? "text-red-600" : "text-green-600"
+            } font-roboto text-sm font-medium`}
+          >
             {formatMoney(currentBalance)}
           </span>
         </div>
@@ -204,7 +212,7 @@ export const ModalPasarelaDePago: React.FC<ModalPasarelaDePagoProps> = ({
                     <span className="mr-3 text-lg">{method.icon}</span>
                   )}
                   <span>{method.name}</span>
-                </div>  
+                </div>
               ))}
             </div>
           )}
