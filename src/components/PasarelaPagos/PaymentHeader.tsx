@@ -8,15 +8,15 @@ interface PaymentHeaderProps {
   onBack: () => void;
 }
 
- const PaymentHeader: React.FC<PaymentHeaderProps> = ({
+const PaymentHeader: React.FC<PaymentHeaderProps> = ({
   totalAmount,
   remainingAmount,
   onBack,
 }) => (
   <div className="bg-white p-5 relative h-[60px] flex items-center">
-    <button 
+    <button
       onClick={onBack}
-      className="bg-gray-400 hover:bg-red-200 p-1 rounded-sm w-8 h-8 flex items-center justify-center mr-4"
+      className="bg-gray-100 hover:bg-gray-200 p-1 rounded-sm w-8 h-8 flex items-center justify-center mr-4 transition-colors"
     >
       <ChevronLeft className="text-gray-500 w-5 h-5" />
     </button>
@@ -29,7 +29,11 @@ interface PaymentHeaderProps {
     </div>
 
     <div className="px-3 py-1">
-      <span className={`${remainingAmount > 0 ? "text-red-600" : "text-green-600"} text-sm font-medium`}>
+      <span
+        className={`${
+          remainingAmount > 0 ? "text-red-600" : "text-green-600"
+        } text-sm font-medium`}
+      >
         {remainingAmount > 0 ? formatCurrency(remainingAmount) : "$0"}
       </span>
     </div>

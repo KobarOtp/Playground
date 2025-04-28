@@ -4,7 +4,11 @@ import { PaymentMethodSelector } from "./PaymentMethodSelector";
 import { PaymentInput } from "./PaymentInput";
 import { PaymentSummary } from "./PaymentSummary";
 import { AppliedPaymentsList } from "../PasarelaPagos/AppliedPaymentsList";
-import { PaymentMethod, AppliedPayment } from "../PasarelaPagos/types";
+import {
+  PaymentMethod,
+  AppliedPayment,
+  PaymentScreenProps,
+} from "../PasarelaPagos/types";
 import BancolombiaLogo from "./assets/bancolombia.jpeg";
 import DaviviendaLogo from "./assets/davivienda.jpeg";
 import NequiLogo from "./assets/nequi.jpeg";
@@ -74,14 +78,21 @@ const defaultPaymentMethods: PaymentMethod[] = [
     image: DaviplataLogo,
   },
 ];
-
-export const PaymentScreen: React.FC = () => {
-  const [selectedMethod, setSelectedMethod] = useState<PaymentMethod | null>(null);
+export const PaymentScreen: React.FC<PaymentScreenProps> = ({
+  onBack,
+  initialAmount,
+}) => {
+  const [selectedMethod, setSelectedMethod] = useState<PaymentMethod | null>(
+    null
+  );
   const [currentAmount, setCurrentAmount] = useState(0);
   const [appliedPayments, setAppliedPayments] = useState<AppliedPayment[]>([]);
-  const [totalAmount] = useState(3900000);
+  const [totalAmount] = useState(initialAmount);
 
-  const totalPaid = appliedPayments.reduce((sum, payment) => sum + payment.amount, 0);
+  const totalPaid = appliedPayments.reduce(
+    (sum, payment) => sum + payment.amount,
+    0
+  );
   const remainingAmount = totalAmount - totalPaid;
 
   const handleAddPayment = () => {
@@ -121,13 +132,12 @@ export const PaymentScreen: React.FC = () => {
   };
 
   return (
-    <div className="w-[430px] h-screen max-w-md mx-auto bg-gray-100 shadow-md overflow-hidden">
+    <div className="h-full w-[430px] bg-gray-100 overflow-hidden">
       <PaymentHeader
         totalAmount={totalAmount}
         remainingAmount={remainingAmount}
-        onBack={() => console.log("Back clicked")}
+        onBack={onBack}
       />
-
       <div className="p-6 flex flex-col items-center">
         <PaymentMethodSelector
           methods={defaultPaymentMethods}

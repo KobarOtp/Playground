@@ -1,24 +1,19 @@
-// --- INTERFACES ---
-
-/**
- * @interface MetodoPago
- * Define la estructura de un método de pago disponible.
- */
-export interface MetodoPago {
-  id: number; // Identificador único del método de pago
-  name: string; // Nombre descriptivo del método de pago (ej: "Efectivo", "Bancolombia")
-  type: "cash" | "credit" | "bank" | "coupon" | "wallet"; // Categoría del método de pago
-  amountAvailable?: number; // Monto disponible (opcional, para créditos, saldos, cupones)
-  details?: string; // Detalles adicionales (ej: número de cuenta, tipo de cuenta)
-  icon?: React.ReactNode; // Componente de icono (opcional)
-  image?: string; // Ruta de la imagen/logo (opcional)
+export interface PaymentMethod {
+  id: number;
+  name: string;
+  type: "cash" | "credit" | "bank" | "coupon" | "wallet";
+  amountAvailable?: number;
+  details?: string;
+  icon?: React.ReactNode;
+  image?: string;
 }
 
-/**
- * @interface PagoAplicado
- * Define la estructura de un pago que ya ha sido aplicado o agregado a la transacción.
- */
-export interface PagoAplicado {
-  method: MetodoPago; // El método de pago utilizado
-  amount: number; // El monto aplicado con este método
+export interface AppliedPayment {
+  method: PaymentMethod;
+  amount: number;
+}
+
+export interface PaymentScreenProps {
+  onBack: () => void;
+  initialAmount: number;
 }
