@@ -1,8 +1,5 @@
-import { Sheet } from "lucide-react";
 import PaymentScreen from "../../components/PasarelaPagos/PaymentScreen";
 import React, { useState, useRef } from "react";
-import { PruebaPasarelaShadCn } from "../../components/PruebaPasarelaShadCn";
-import { SheetDemo } from "../../components/PasarelaPagos/SheetDemo";
 
 const IpOnline = () => {
   const [showPayment, setShowPayment] = useState(false);
@@ -18,12 +15,7 @@ const IpOnline = () => {
   };
 
   return (
-    <div>
-      <SheetDemo />
-    </div>
-    /* Contenedor principal con fondo gris y flexbox para centrar el contenido 
     <div className="min-h-screen bg-gray-100 flex flex-col">
-      {/* Contenido principal siempre visible *
       <div className="m-auto p-8 bg-white rounded-lg shadow-md w-full max-w-md">
         <h1 className="text-2xl font-bold text-center mb-6">Pago Rápido</h1>
         <div className="space-y-4">
@@ -52,8 +44,6 @@ const IpOnline = () => {
           </button>
         </div>
       </div>
-
-      {/* Panel de pagos que aparece al lado 
       {showPayment && (
         <div
           ref={panelRef}
@@ -63,7 +53,7 @@ const IpOnline = () => {
           <PaymentScreen onBack={handleClose} initialAmount={Number(amount)} />
         </div>
       )}
-    </div> */
+    </div>
   );
 };
 

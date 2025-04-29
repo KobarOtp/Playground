@@ -77,6 +77,30 @@ const defaultPaymentMethods: PaymentMethod[] = [
     details: "Ahorros | 569652846",
     image: DaviplataLogo,
   },
+  {
+    id: 10,
+    name: "Pablo",
+    type: "cash",
+    icon: <Iconos icono="billete" />,
+  },
+  {
+    id: 11,
+    name: "Escobar",
+    type: "cash",
+    icon: <Iconos icono="billete" />,
+  },
+  {
+    id: 12,
+    name: "Marin",
+    type: "cash",
+    icon: <Iconos icono="billete" />,
+  },
+  {
+    id: 13,
+    name: "Isabella",
+    type: "cash",
+    icon: <Iconos icono="billete" />,
+  },
 ];
 export const PaymentScreen: React.FC<PaymentScreenProps> = ({
   onBack,

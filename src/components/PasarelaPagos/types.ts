@@ -17,3 +17,17 @@ export interface PaymentScreenProps {
   onBack: () => void;
   initialAmount: number;
 }
+
+export interface PaymentInputProps {
+  method: PaymentMethod;
+  amount: number;
+  remainingAmount: number;
+  onAmountChange: (amount: number) => void;
+  onAddPayment: () => void;
+  onFullPayment: () => void;
+}
+
+export interface AppliedPaymentsListProps {
+  payments: AppliedPayment[];
+  onRemove: (index: number) => void;
+}
